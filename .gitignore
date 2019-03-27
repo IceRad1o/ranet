@@ -34,4 +34,5 @@
 *.DS_store
 .vscode
 .idea
-
+test/.idea
+test/cmake-build-debug
