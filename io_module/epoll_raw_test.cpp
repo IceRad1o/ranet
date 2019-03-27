@@ -1,13 +1,11 @@
-//
-// Created by jialeiwang on 3/26/19.
-//
-
+// this is a example from https://suchprogramming.com/epoll-in-3-easy-steps/
+// gcc -Wall -Werror -o epoll.out epoll_raw_test.cpp
 #define MAXEVENTS 5
 #define READ_MAX 10
-#include<stdio.h>
-#include<unistd.h>
+#include<stdio.h>  // fprintf
+#include<unistd.h> // close read
 #include <sys/epoll.h>
-#include <string.h>
+#include <string.h> // strncmp
 
 int main(int argc,char *argv[]){
     int running =1,event_count,i;
