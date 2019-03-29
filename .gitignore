@@ -32,7 +32,9 @@
 *.app
 
 *.DS_store
-.vscode
-.idea
+vscode
+idea
 test/.idea
 test/cmake-build-debug
+Test/CMakelists.txt
+
