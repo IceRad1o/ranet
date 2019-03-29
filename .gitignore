@@ -33,8 +33,10 @@
 
 *.DS_store
 vscode
-idea
+.idea
+Cmake-build-debug
+CMakeLists.txt
 test/.idea
 test/cmake-build-debug
-Test/CMakelists.txt
+Test/CMakeLists.txt
 
