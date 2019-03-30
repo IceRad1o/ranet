@@ -38,5 +38,5 @@ Cmake-build-debug
 CMakeLists.txt
 test/.idea
 test/cmake-build-debug
-Test/CMakeLists.txt
+test/CMakeLists.txt
 
