@@ -1,37 +1,42 @@
+#include <sys/socket.h> //socket
+#include <string.h> // memset
+#include <netinet/in.h> // sockaddr_in
+#include <stdio.h> //printf
+#include <time.h>
+#include <unistd.h> // write
 #include <iostream>
-#include <pthread.h>
-#include <string.h>
-#include "threadpool.hpp"
-#include "socklib.hpp"
 
-using namespace std;
-class A{
-public:
-    A(){
-        cout<<"constructor"<<endl;
-    }
-    ~A(){
-        cout<<"destructor"<<endl;
-    }
-};
 
-pthread_t ntid;
-
-void *work(void *arg){
-    std::cout<<"pthread test"<<std::endl;
+int create_and_bind(int port)
+{
+    int listenfd;
+    struct sockaddr_in servaddr;
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&servaddr, 0, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(port);
+    if(bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
+        return -1;
+    listen(listenfd, 1024);
+    return listenfd;
 }
+
 
 int main() {
-   // int err = pthread_create(&ntid,NULL,work,NULL);
-    //std::vector<pthread_t> test(10);
-    string s1 = string("string1");
-    string s2 = string("string2");
-    const char *p1 =s1.substr(1).data();
-    const char *p2 =s2.substr(1).data();
-    cout<<p1<<p2<<endl;
-    A(),
-    cout<<"end xxx\n";
-    cout<<"end yyy\n";
-    std::cin.get();
+    time_t ticks;
+    char buff[4096];
+    bool stop = false;
+    int listenfd = create_and_bind(13);
+    int connfd;
+    printf("test server is running\n");
+    while(1) {
+        connfd = accept(listenfd, (struct sockaddr *) NULL, NULL);
+        ticks = time(NULL);
+        snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
+        write(connfd, buff, strlen(buff));
+        close(connfd);
+    }
     return 0;
 }
+
