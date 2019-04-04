@@ -14,7 +14,7 @@ typedef struct{
 ssize_t rio_readn(int fd, void *usrbuf, size_t n);
 ssize_t rio_writen(int fd, void *userbuf, size_t n);
 
-//rio buffered io functions
+//rio buffered iuput functions
 //readnb can be used to for both text file and binary file while readlineb is just for text file
 void rio_readinitb(rio_t *rp, int fd);
 ssize_t rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen);

@@ -64,7 +64,7 @@ void readinitb(rio_t *rp, int fd)
 
 static ssize_t rio_read(rio_t *rp, void*userbuf, size_t n)
 {
-
+    return 0;
 }
 
 /*
