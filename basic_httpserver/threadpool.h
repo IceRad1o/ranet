@@ -2,7 +2,7 @@
 #include <vector>
 #include <utility>
 
-
+// a simple threadpool
 class ThreadPool{
 public:
     ThreadPool(size_t _worker_num);

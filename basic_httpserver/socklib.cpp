@@ -1,76 +1,6 @@
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-
-#include <errno.h>
-#include <fcntl.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <sys/socket.h>
-// #include <sys/epoll.h>
-#include <netinet/tcp.h>
-#include "socklib.hpp"
-
-ssize_t rio_readn(int fd, void *usrbuf, size_t n)
-{
-    size_t nleft = n;
-    ssize_t nread;
-    // char *bufp = usrbuf it's ok with c but not with c++
-    char *bufp = (char*)usrbuf;
-    while(nleft>0)
-    {
-        if((nread = read(fd, bufp, n)) < 0 )
-        {
-            if(errno == EINTR)   // Interrupted by sig handler return
-                nread = 0;      // call read() again
-            else
-                return -1;      // errno set by read()
-        }
-        else if(nread == 0)
-            break;              // EOF
-        nleft -= nread;
-        bufp += nread;
-    }
-    return n-nread;
-}
+#include "socklib.h"
 
 
-ssize_t rio_writen(int fd, void*usrbuf, size_t n)
-{
-    size_t nleft = n;
-    ssize_t nwritten;
-    char *bufp = (char*)usrbuf;
-    while(nleft > 0)
-    {
-        if((nwritten = write(fd, bufp, n)) <= 0)
-        {
-            if(errno == EINTR)
-                nwritten = 0;
-            else
-                return -1;
-        }
-        nleft -= nwritten;
-        bufp += nwritten;
-    }
-    return n;
-}
-
-void readinitb(rio_t *rp, int fd)
-{
-    rp->rio_fd = fd;
-    rp->rio_cnt = 0;
-    rp->rio_bufptr = rp->rio_buf;
-}
-
-static ssize_t rio_read(rio_t *rp, void*userbuf, size_t n)
-{
-    return 0;
-}
-
-/*
-ssize_t readlineb(rio_t *rp, void *usrbuf ,size_t maxlen);
-ssize_t readnb(rio *rp, void *usrbuf, size_t n);
-*/
 
 // this is a simple example for binding and listening
 int create_and_bind_raw(int port)
@@ -136,6 +66,10 @@ int create_and_bind(int port,bool reuseport){
         abort();
     }
     freeaddrinfo(result);
+
+    /* Make it a listening socket ready to accept connection requests */
+    if (listen(sfd, 5) < 0)
+        return -1;
     return sfd;
     // why there isn't a listen function?
 }
@@ -162,6 +96,14 @@ int accept_connection(int sfd)
 {
     int infd = accept(sfd, NULL, NULL);
     return infd;
+}
+
+int accept_conn(int fd, struct sockaddr *addr, socklen_t *addrlen)
+{
+    int rc;
+    if((rc = accept(fd, addr, addrlen)) < 0)
+        perror("accept error");
+    return rc;
 }
 /*
 int accept_connection_linux(int sfd)

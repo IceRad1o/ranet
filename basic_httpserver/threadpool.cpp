@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "threadpool.hpp"
+#include "threadpool.h"
 
 void *thread_pool_work(void *arg){
     ThreadPool *pool = static_cast<ThreadPool*>(arg);
