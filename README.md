@@ -1,6 +1,13 @@
 ranet
 
 c++11 network library
+=======
+some rep for learning:
+libevent
+libuv: https://github.com/libuv/libuv. It's a multi-platform support library on async I/O
+libev: 
+boost::asio
+windows/iocp
 
 
 
@@ -95,6 +102,5 @@ abcdefghijklmnopqrstuvwxyz1234567890abcdef
 
 
 ### HTTP server module
-
 
 
