@@ -1,7 +1,5 @@
 #include "socklib.h"
 
-
-
 // this is a simple example for binding and listening
 int create_and_bind_raw(int port)
 {
@@ -31,18 +29,8 @@ int create_and_bind(int port,bool reuseport){
     hints.ai_family = AF_UNSPEC;      // support IPv4 and IPv6 chioces
     hints.ai_socktype = SOCK_STREAM;  // tcp socket
     hints.ai_flags = AI_PASSIVE ;     // all interfaces
-    /*
-     * getaddrinfo(const char *node,const char *service, cosnt struct addrinfo*hits, struct addrinfo **res);
-     * server often set node as NULL so return [::]
-     * the following is from linux man page---about how server typically do.
-     * If the AI_PASSIVE flag is specified in hints.ai_flags, and node is
-     * NULL, then the returned socket addresses will be suitable for
-     * bind(2)ing a socket that will accept(2) connections.  The returned
-     * socket address will contain the "wildcard address" (INADDR_ANY for
-     * IPv4 addresses, IN6ADDR_ANY_INIT for IPv6 address).  The wildcard
-     * address is used by applications (typically servers) that intend to
-     * accept connections on any of the host's network addresses.  If node
-     * is not NULL, then the AI_PASSIVE flag is ignored.*/
+
+    //getaddrinfo(const char *node,const char *service, cosnt struct addrinfo*hits, struct addrinfo **res)
     s = getaddrinfo(NULL, strport, &hints, &result);
     if(s!= 0){
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));

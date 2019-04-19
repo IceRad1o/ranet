@@ -62,7 +62,6 @@ struct HTTPRequest {
  */
 void doit(int fd);
 
-// read request headers
 void read_requesthdrs(rio_t *rp);
 
 int parse_uri(char *uri, char *filename, char *cgiargs);

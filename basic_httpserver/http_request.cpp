@@ -28,8 +28,8 @@ void doit(int fd) {
 
     /* Parse URI from GET request */
     is_static = parse_uri(uri, filename, cgiargs);
-
-    if (stat(filename, &sbuf) < 0) {
+    const char *test = "../home.html";
+    if (stat((const char*)filename, &sbuf) < 0) {
         clienterror(fd, filename, "404", "Not found", "Tiny couldn't find this file");
         return;
     }
@@ -62,7 +62,6 @@ void read_requesthdrs(rio_t *rp)
     }
     return;
 }
-
 
 int parse_uri(char *uri, char *filename, char *cgiargs)
 {
@@ -132,19 +131,22 @@ void serve_static(int fd, char *filename, int filesize)
     char *srcp, filetype[MAXLINE], buf[MAXBUF];
 
     /* Send response headers to client */
-    get_filetype(filename, filetype);
+    get_filetype(filename, filetype);       //line:netp:servestatic:getfiletype
     sprintf(buf, "HTTP/1.0 200 OK\r\n");    //line:netp:servestatic:beginserve
     sprintf(buf, "%sServer: Tiny Web Server\r\n", buf);
     sprintf(buf, "%sConnection: close\r\n", buf);
     sprintf(buf, "%sContent-length: %d\r\n", buf, filesize);
     sprintf(buf, "%sContent-type: %s\r\n\r\n", buf, filetype);
+    rio_writen(fd, buf, strlen(buf));       //line:netp:servestatic:endserve
+    printf("Response headers:\n");
+    printf("%s", buf);
 
-    /* send response body to client*/
-    srcfd = open(filename, O_RDONLY, 0);
-    srcp = (char *)mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
-    close(srcfd);
-    rio_writen(fd, srcp, filesize);
-    munmap(srcp, filesize);
+    /* Send response body to client */
+    srcfd = open(filename, O_RDONLY, 0);    //line:netp:servestatic:open
+    srcp = (char *)mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);//line:netp:servestatic:mmap
+    close(srcfd);                           //line:netp:servestatic:close
+    rio_writen(fd, srcp, filesize);         //line:netp:servestatic:write
+    munmap(srcp, filesize);                 //line:netp:servestatic:munmap
 }
 
 
