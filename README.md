@@ -17,9 +17,11 @@ windows/iocp
 
 ------
 
-So when we start to learn network programming, usually we'll write a echo tcp server and client to get familiar with socket apis.
+So when we start to learn network programming, usually we'll write **a echo tcp server** and client to get familiar with socket apis.
 
 When it comes to C10K problem, we found we should expand our io module, because a simple tcp server is not effective enough.So we'll try different methods like fork, pthread(+threadpool), io multiplexing(select, poll, epoll) or reactor design pattern.
+
+
 
 To test serval io modules, we decide to implement a http server.
 
@@ -121,6 +123,8 @@ for(;;){
 
 2. 多进程
 
+调用fork时，系统做了什么？(为什么创建进程的开销要比进程大)
+
 ```c++
 
 for(;;){
@@ -155,7 +159,7 @@ for(;;){
 
 4. 多线程+线程池
 
-减去创建和销毁线程的开销。
+减去创建和销毁线程的开销。基本思想是用一个loop来accept，然后把连接分配给每个线程。但是很多时候处理长链接的时候，线程会被IO阻塞住，这时很可能就没有多余的线程来处理新的连接了。
 
 ```c++
 
@@ -164,9 +168,20 @@ for(;;){
 
 
 5. 非阻塞I/O
-6. I/O 复用 select
-7. I/O 复用 poll
-8. I/O 复用 epoll
+
+既然模型4的问题出在阻塞，我们可以把blocking IO换成non-blocking IO. 具体就是有数据就返回数据，没有就返回-1并且把errno设成EAGAIN
+
+
+
+##### 事件驱动
+
+对于模型5，那么怎么知道某个fd可以读呢？通过IO复用来实现，把IO复用放进一个loop中（event loop）反复check。
+
+同步的事件循环+non-blocking IO又被称为Reactor模式。listenfd如果可读，调用accept把新的fd加入select/poll/epoll 中。是普通的连接fd，就加入一个生产者消费者队列中，等工作线程来拿。
+
+5. I/O 复用 select
+6. I/O 复用 poll
+7. I/O 复用 epoll
 
 分为LT（水平触发）和ET（边缘触发）
 
@@ -174,7 +189,15 @@ for(;;){
 
 
 
-#### 5.一些trick
+#### 5.一些trick和问题
+
+如何设计和实现timer：nginx是设计成rbtree的
+
+惊群问题
+
+
+
+
 
 
 
