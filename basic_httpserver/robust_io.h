@@ -21,15 +21,19 @@ typedef struct{
  * it's easy to transfer data between memory and file
  */
 ssize_t rio_readn(int fd, void *usrbuf, size_t n);
+
 ssize_t rio_writen(int fd, void *userbuf, size_t n);
 
-//rio buffered input functions
-//readnb can be used to for both text file and binary file while readlineb is just for text file
+/* rio buffered input functions
+ * readnb can be used to for both text file and binary file
+ * while readlineb is just for text file
+ */
 void rio_readinitb(rio_t *rp, int fd);
+
 ssize_t rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen);
+
 ssize_t rio_readnb(rio_t *rp, void *usrbuf, size_t n);
 
-
-//wrapper functions for robust io
+// todo:wrapper functions for robust io
 
 #endif //BASIC_HTTPSERVER_ROBUST_IO_H

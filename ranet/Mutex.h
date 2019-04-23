@@ -1,35 +1,52 @@
 //
-// Created by Jialei Wang on 2019/3/29.
+// Created by Jialei Wang on 2019/4/23.
 //
 
 #ifndef RANET_MUTEX_H
 #define RANET_MUTEX_H
 
 #include <pthread.h>
-#include <assert.h>
-#include "noncopyable.h"
+#include "Noncopyable.h"
 
-#if defined(__clang__) && (!defined(SWIG))
-#define THREAD_ANNOTATION_ATTRIBUTE__(x)  __attribute__((x))
-#else
-#define THREAD_ANNOTATION_ATTRIBUTE__(x)
-#endif
+namespace ranet
+{
 
-#define CAPABILITY(x) \
-    THREAD_ANNOTATION_ATTTIBUTE__(capability(x))
-
-namespace ranet{
-    class  MutexLock : noncopyable
+class MutexLock: public Noncopyable
+{
+public:
+    MutexLock()
     {
-    public:
-        MutexLock():holder_(0)
-        {
+        pthread_mutex_init(&mutex, NULL);
+    }
+    ~MutexLock(){
+        pthread_mutex_destroy(&mutex);
+    }
+    void lock(){
+        pthread_mutex_lock(&mutex);
+    }
+    void unlock(){
+        pthread_mutex_unlock(&mutex);
+    }
+    pthread_mutex_t *getPthreadMutex(){
+        return &mutex;
+    }
+private:
+    pthread_mutex_t mutex;
+};
 
-        }
-        ~MutexLock(){}
-    private:
+class MutexLockGuard:public Noncopyable
+{
+public:
+    MutexLockGuard(MutexLock& mutexlock): _mutexlock(mutexlock)
+    {
+        _mutexlock.lock();
+    }
+    ~MutexLockGuard(){
+        _mutexlock.unlock();
+    }
+private:
+    MutexLock& _mutexlock;
+};
 
-        friend class Condition;
-    };
-}
+} //namespace ranet
 #endif //RANET_MUTEX_H

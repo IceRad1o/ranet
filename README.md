@@ -19,6 +19,8 @@ windows/iocp
 
 So when we start to learn network programming, usually we'll write **a echo tcp server** and client to get familiar with socket apis.
 
+
+
 When it comes to C10K problem, we found we should expand our io module, because a simple tcp server is not effective enough.So we'll try different methods like fork, pthread(+threadpool), io multiplexing(select, poll, epoll) or reactor design pattern.
 
 
@@ -121,27 +123,31 @@ for(;;){
 }
 ```
 
-2. 多进程
-
-调用fork时，系统做了什么？(为什么创建进程的开销要比进程大)
+2. 基于多进程的并发
 
 ```c++
-
 for(;;){
     int connfd = accept(listenfd, NULL, NULL);
     pid_t pid = fork();
     if(pid == 0){
         //child 
+        close(listenfd);
         doit(connfd);
+        exit(0);
     }
     else{
-        // parent: close dup fd
+        // parent: close dup fd this is important
         close(connfd);
     }
 }
 ```
 
-3.  多线程
+**Attention**：
+
+- 调用fork时，系统做了什么？(为什么创建进程的开销要比进程大)
+- 像多进程的服务器，在运行时间比较长的时候，我们需要一个SIGCHLD处理程序，来回收zombie子进程的资源
+
+3. 多线程
 
 线程数上升后线程调度的问题会影响性能
 
@@ -173,15 +179,18 @@ for(;;){
 
 
 
-##### 事件驱动
+##### 事件驱动 （event-driven）
 
-对于模型5，那么怎么知道某个fd可以读呢？通过IO复用来实现，把IO复用放进一个loop中（event loop）反复check。
+对于模型5，那么怎么知道某个fd可以读呢？通过IO复用来实现，把IO复用放进一个loop中（event loop）反复check。IO多路复用就是事件驱动的基础
 
 同步的事件循环+non-blocking IO又被称为Reactor模式。listenfd如果可读，调用accept把新的fd加入select/poll/epoll 中。是普通的连接fd，就加入一个生产者消费者队列中，等工作线程来拿。
 
-5. I/O 复用 select
-6. I/O 复用 poll
-7. I/O 复用 epoll
+6. I/O 复用 select
+
+
+
+5. I/O 复用 poll
+6. I/O 复用 epoll
 
 分为LT（水平触发）和ET（边缘触发）
 

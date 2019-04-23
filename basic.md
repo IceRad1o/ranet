@@ -1,3 +1,20 @@
+Select
+
+```c++
+#include<unistd.h>
+#include<sys/types.h>
+int select(int n, fd_set *fdset, NULL, NULL, NULL)
+    // select 返回已经准备好的fd个数，出错则返回-1
+FD_ZERO(fd_set *fdset)     // clear all bits in fdset
+FD_CLR(int fd, fd_set *fdset)		// clear bit fd in fdset
+FD_SET(int fd, fd_set *fdset)		// turn on bit fd in fdset
+FD_ISSET(int fd, fd_set *fdset)	// is bit fd in fdset turned
+```
+
+
+
+
+
 Epoll 使用
 
 epoll接口
