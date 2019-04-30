@@ -1,4 +1,78 @@
-Select
+#### 1.How to write a threadpool
+
+Threadpool的意义在于节省创建和销毁线程的开销。线程池对象应该拥有一个线程的vector和一个task范性的队列，在创建时就会初始化N个线程，
+
+```c++
+// C98
+// 具体要做的事情就可以继承Task，重写run方法
+class Task{
+  Task() = default;
+  virtual void run() = 0;
+  virtual ~Task();
+};
+
+class Threadpool : public noncopyable
+{
+  public:
+    Threadpool(int num);
+     ～Threadpool();
+    
+    void add_task(const Task &task); // 向队列里添加任务。
+    void stop(); // 在这里销毁 mutex和condi 所有的线程都要thread.join 
+    // Task take() // 取出的操作可以放在execute里，也可以像这样封装起来
+    // size_t size() // 可以在测试的时候获取队列的大小
+  private:
+  	static void thread_execute(void *arg); // 线程的执行函数，线程在这里从Taskqueue里取出Task并执行Task重写的run函数。线程执行完成后会重新去队列中取出可执行的task
+  private:
+    bool isrunning;
+    int thread_num;
+    pthread_mutex_t _mutex;
+    pthread_cond_t _condition;
+    std::queue<Task> taskqueue;
+    std::vector<pthread_t> threads;
+};
+
+// in test.cpp
+class mytask:public Task{
+    ...
+}
+mytask taskobj
+Threadpool threadpool(10);
+for(int i=0;i<100;++i){
+    pool.addtask(&taskobj);
+}
+```
+
+如果每个Task都是一个function对象，那么不用定义Task基类
+
+> typedef std::function<void()> Task; 
+
+```c++
+// C++ 03
+typedef std::function<void()> Task; 
+// 在main函数中这样调用
+class MyTask{
+    ...
+    void run(int i, const char *p) ...
+}
+Threadpool threadpool(10);
+MyTask taskobj[20];
+for(int i=0;i<20;++i){
+    threadpool.addtask(std::bind(&MyTask::run, &taskObj[i],i, "hello"));
+}
+```
+
+如果是c++11的实现版本呢？
+
+```c++
+
+```
+
+#### 2.c++ std::function std::bind 以及labmda
+
+
+
+#### 3.IO复用 select/poll/epoll 
 
 ```c++
 #include<unistd.h>

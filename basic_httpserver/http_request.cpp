@@ -28,7 +28,6 @@ void doit(int fd) {
 
     /* Parse URI from GET request */
     is_static = parse_uri(uri, filename, cgiargs);
-    const char *test = "../home.html";
     if (stat((const char*)filename, &sbuf) < 0) {
         clienterror(fd, filename, "404", "Not found", "Tiny couldn't find this file");
         return;
@@ -68,7 +67,8 @@ int parse_uri(char *uri, char *filename, char *cgiargs)
     char *ptr;
     if(!strstr(uri, "cgi-bin")){    /* static content */
         strcpy(cgiargs, "");
-        strcpy(filename, ".");
+         strcpy(filename, ".."); // test on clion
+        //strcpy(filename, ".");
         strcat(filename, uri);
         if(uri[strlen(uri)-1] == '/')
             strcat(filename,"home.html");

@@ -7,6 +7,7 @@
 
 #include <pthread.h>
 #include <vector>
+#include <queue>
 namespace ranet{
     class Threadpool
     {
